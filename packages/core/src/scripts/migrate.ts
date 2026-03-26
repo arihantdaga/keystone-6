@@ -68,6 +68,12 @@ export async function migrateCreate(
   await esbuild.build(await getEsbuildConfig(cwd))
 
   const system = createSystem(await importBuiltKeystoneConfiguration(cwd))
+
+  if (system.config.db.provider === 'mongodb') {
+    throw new Error(
+      'MongoDB does not support migrations. Use `keystone dev` which uses `db push` automatically, or run `prisma db push` directly.'
+    )
+  }
   if (frozen) {
     await validateArtifacts(cwd, system)
     log('✨ GraphQL and Prisma schemas are up to date')
@@ -177,6 +183,13 @@ export async function migrateApply(
   await esbuild.build(await getEsbuildConfig(cwd))
 
   const system = createSystem(await importBuiltKeystoneConfiguration(cwd))
+
+  if (system.config.db.provider === 'mongodb') {
+    throw new Error(
+      'MongoDB does not support migrations. Use `keystone dev` which uses `db push` automatically, or run `prisma db push` directly.'
+    )
+  }
+
   if (frozen) {
     await validateArtifacts(cwd, system)
     log('✨ GraphQL and Prisma schemas are up to date')

@@ -41,6 +41,13 @@ function isUuid(x: IDType) {
   return x.toLowerCase()
 }
 
+const OBJECTID_REGEX = /^[0-9a-fA-F]{24}$/
+function isObjectId(x: IDType) {
+  if (typeof x !== 'string') return
+  if (!OBJECTID_REGEX.test(x)) return
+  return x
+}
+
 const nonCircularFields = {
   equals: g.arg({ type: g.ID }),
   in: g.arg({ type: g.list(g.nonNull(g.ID)) }),
@@ -102,6 +109,9 @@ const NATIVE_TYPES: {
   postgresql: {
     uuid: 'Uuid' as const,
   },
+  mongodb: {
+    objectid: 'ObjectId' as const,
+  },
 }
 
 function unpack(
@@ -137,6 +147,7 @@ function unpack(
   if (kind === 'string') return { scalar: 'String', default: undefined }
   if (kind === 'number') return { scalar: type ?? 'Int', default: undefined }
   if (kind === 'autoincrement') return { scalar: type ?? 'Int', default: { kind } }
+  if (kind === 'objectid') return { scalar: 'String', default: { kind: 'auto' as const } }
   throw new Error(`Unknown id type ${kind}`)
 }
 
@@ -148,7 +159,8 @@ export function idFieldType(config: IdFieldConfig): FieldTypeFunc<BaseListTypeIn
     BigInt: isBigInt,
     String: isString,
     UUID: isUuid, // TODO: remove in breaking change
-  }[kind === 'uuid' ? 'UUID' : dbFieldOptions.scalar]
+    ObjectId: isObjectId,
+  }[kind === 'uuid' ? 'UUID' : kind === 'objectid' ? 'ObjectId' : dbFieldOptions.scalar]
 
   function parse(value: IDType) {
     const result = parseTypeFn(value)
@@ -171,11 +183,29 @@ export function idFieldType(config: IdFieldConfig): FieldTypeFunc<BaseListTypeIn
       )
     }
 
+    if (meta.provider === 'mongodb' && kind !== 'objectid') {
+      throw new Error(
+        `MongoDB only supports { kind: 'objectid' } for id fields, but got { kind: '${kind}' }`
+      )
+    }
+
+    if (meta.provider !== 'mongodb' && kind === 'objectid') {
+      throw new Error(
+        `{ kind: 'objectid' } is only supported with the MongoDB provider`
+      )
+    }
+
     return fieldType({
       ...dbFieldOptions,
       kind: 'scalar',
       mode: 'required',
       nativeType: NATIVE_TYPES[meta.provider]?.[kind],
+      ...(meta.provider === 'mongodb'
+        ? {
+            map: '_id',
+            extendPrismaSchema: (field: string) => field,
+          }
+        : {}),
     })({
       ...config,
 

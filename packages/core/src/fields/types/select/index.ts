@@ -172,7 +172,7 @@ export function select<ListTypeInfo extends BaseListTypeInfo>(
         values: g.enumValues(enumValues),
       })
       return fieldType(
-        meta.provider === 'sqlite'
+        meta.provider === 'sqlite' || meta.provider === 'mongodb'
           ? { kind: 'scalar', scalar: 'String', ...commonDbFieldConfig }
           : {
               kind: 'enum',

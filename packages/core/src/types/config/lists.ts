@@ -479,6 +479,7 @@ export type IdFieldConfig =
   | { kind: 'nanoid'; length?: number; type?: 'String' }
   | { kind: 'autoincrement'; type?: 'Int' | 'BigInt' }
   | { kind: 'number'; type: 'Int' | 'BigInt' }
+  | { kind: 'objectid'; type?: 'String' }
 
 export type ListDBConfig = {
   /**
