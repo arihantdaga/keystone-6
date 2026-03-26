@@ -322,6 +322,56 @@ const DateTimeFilter: DateTimeFilterType = g.inputObject({
   }),
 })
 
+type DecimalNullableFilterType = GInputObjectType<{
+  equals: GArg<typeof g.Decimal> // can be null
+  in: GArg<GList<GNonNull<typeof g.Decimal>>> // can be null
+  notIn: GArg<GList<GNonNull<typeof g.Decimal>>> // can be null
+  lt: GArg<typeof g.Decimal>
+  lte: GArg<typeof g.Decimal>
+  gt: GArg<typeof g.Decimal>
+  gte: GArg<typeof g.Decimal>
+  not: GArg<DecimalNullableFilterType> // can be null
+}>
+
+const DecimalNullableFilter: DecimalNullableFilterType = g.inputObject({
+  name: 'DecimalNullableFilter',
+  fields: () => ({
+    equals: g.arg({ type: g.Decimal }), // can be null
+    in: g.arg({ type: g.list(g.nonNull(g.Decimal)) }), // can be null
+    notIn: g.arg({ type: g.list(g.nonNull(g.Decimal)) }), // can be null
+    lt: g.arg({ type: g.Decimal }),
+    lte: g.arg({ type: g.Decimal }),
+    gt: g.arg({ type: g.Decimal }),
+    gte: g.arg({ type: g.Decimal }),
+    not: g.arg({ type: DecimalNullableFilter }), // can be null
+  }),
+})
+
+type DecimalFilterType = GInputObjectType<{
+  equals: GArg<typeof g.Decimal>
+  in: GArg<GList<GNonNull<typeof g.Decimal>>>
+  notIn: GArg<GList<GNonNull<typeof g.Decimal>>>
+  lt: GArg<typeof g.Decimal>
+  lte: GArg<typeof g.Decimal>
+  gt: GArg<typeof g.Decimal>
+  gte: GArg<typeof g.Decimal>
+  not: GArg<DecimalFilterType>
+}>
+
+const DecimalFilter: DecimalFilterType = g.inputObject({
+  name: 'DecimalFilter',
+  fields: () => ({
+    equals: g.arg({ type: g.Decimal }),
+    in: g.arg({ type: g.list(g.nonNull(g.Decimal)) }),
+    notIn: g.arg({ type: g.list(g.nonNull(g.Decimal)) }),
+    lt: g.arg({ type: g.Decimal }),
+    lte: g.arg({ type: g.Decimal }),
+    gt: g.arg({ type: g.Decimal }),
+    gte: g.arg({ type: g.Decimal }),
+    not: g.arg({ type: DecimalFilter }),
+  }),
+})
+
 type BigIntNullableFilterType = GInputObjectType<{
   equals: GArg<typeof g.BigInt> // can be null
   in: GArg<GList<GNonNull<typeof g.BigInt>>> // can be null
@@ -397,6 +447,11 @@ export const Float = {
 export const DateTime = {
   optional: DateTimeNullableFilter,
   required: DateTimeFilter,
+}
+
+export const Decimal = {
+  optional: DecimalNullableFilter,
+  required: DecimalFilter,
 }
 
 export const BigInt = {

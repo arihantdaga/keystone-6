@@ -153,15 +153,30 @@ async function generate(provider: Provider) {
   const prismaFilterTypes = (await getDMMF({ datamodel: schema })).schema.inputObjectTypes
     .prisma as DMMF.InputType[] // TODO: why...
 
+  // For providers that don't support all scalars (e.g. MongoDB lacks Decimal),
+  // we generate fallback filter types using PostgreSQL's DMMF so that the
+  // TypeScript type system stays consistent across all providers.
+  const scalarsForProvider = provider === 'mongodb' ? MONGODB_SCALARS : SCALARS
+  const missingScalars = SCALARS.filter(
+    s => !(scalarsForProvider as readonly string[]).includes(s)
+  )
+  let fallbackFilterTypes: DMMF.InputType[] = []
+  if (missingScalars.length > 0) {
+    const fallbackSchema = getSchemaForProvider('postgresql')
+    fallbackFilterTypes = (await getDMMF({ datamodel: fallbackSchema })).schema.inputObjectTypes
+      .prisma as DMMF.InputType[]
+  }
+
   // for generation
   const filters = []
   const exports_ = []
-  const scalarsForProvider = provider === 'mongodb' ? MONGODB_SCALARS : SCALARS
-  for (const scalar of scalarsForProvider) {
+  for (const scalar of SCALARS) {
+    const isMissing = missingScalars.includes(scalar)
+    const filterTypes = isMissing ? fallbackFilterTypes : prismaFilterTypes
     // we use Boolean, Prisma uses Bool, oh well
     const prismaScalar = scalar === 'Boolean' ? 'Bool' : scalar
 
-    for (const filter of prismaFilterTypes) {
+    for (const filter of filterTypes) {
       // why? for String, the case insensitivity mode argument is not recursively supported
       const nesting = scalar === 'String'
 
