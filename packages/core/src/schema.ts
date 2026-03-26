@@ -86,14 +86,17 @@ function identity<T>(x: T) {
 export function config<TypeInfo extends BaseKeystoneTypeInfo>(
   config: KeystoneConfigPre<TypeInfo>
 ): KeystoneConfig<TypeInfo> {
-  if (!['postgresql', 'sqlite', 'mysql'].includes(config.db.provider)) {
-    throw new TypeError(`"db.provider" only supports "sqlite", "postgresql" or "mysql"`)
+  if (!['postgresql', 'sqlite', 'mysql', 'mongodb'].includes(config.db.provider)) {
+    throw new TypeError(`"db.provider" only supports "sqlite", "postgresql", "mysql" or "mongodb"`)
   }
 
   // WARNING: Typescript should prevent this, but any string is useful for Prisma errors
-  config.db.url ??= 'postgres://'
+  config.db.url ??=
+    config.db.provider === 'mongodb' ? 'mongodb://localhost:27017/keystone' : 'postgres://'
 
-  const defaultIdField = config.db.idField ?? { kind: 'cuid' }
+  const defaultIdField =
+    config.db.idField ??
+    (config.db.provider === 'mongodb' ? { kind: 'objectid' as const } : { kind: 'cuid' as const })
   const cors =
     config.server?.cors === true
       ? { origin: true, credentials: true }

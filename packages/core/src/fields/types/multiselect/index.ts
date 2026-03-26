@@ -127,7 +127,7 @@ export function multiselect<ListTypeInfo extends BaseListTypeInfo>(
       map: config?.db?.map,
       extendPrismaSchema: config.db?.extendPrismaSchema,
       default:
-        meta.provider === 'sqlite'
+        meta.provider === 'sqlite' || meta.provider === 'mongodb'
           ? undefined
           : {
               kind: 'literal',

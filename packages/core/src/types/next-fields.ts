@@ -125,6 +125,7 @@ export type ScalarDBFieldDefault<
             | { kind: 'ulid' }
             | { kind: 'nanoid'; length?: number }
             | { kind: 'random'; bytes: number; encoding: 'hex' | 'base64url' }
+            | { kind: 'auto' }
           Boolean: Literal<boolean>
           Json: Literal<string>
           Float: Literal<number>

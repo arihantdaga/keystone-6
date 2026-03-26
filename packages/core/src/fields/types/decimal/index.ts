@@ -62,6 +62,9 @@ export function decimal<ListTypeInfo extends BaseListTypeInfo>(
     if (meta.provider === 'sqlite') {
       throw new Error('The decimal field does not support sqlite')
     }
+    if (meta.provider === 'mongodb') {
+      throw new Error('The decimal field does not support mongodb')
+    }
     if (!Number.isInteger(scale)) {
       throw new TypeError(
         `The scale for decimal fields must be an integer but the scale for the decimal field at ${meta.listKey}.${meta.fieldKey} is not an integer`

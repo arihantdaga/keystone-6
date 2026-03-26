@@ -159,11 +159,14 @@ export async function dev(
 
           const paths = system.getPaths(cwd)
           if (dbPush) {
-            const created = await createDatabase(
-              system.config.db.url,
-              path.dirname(paths.schema.prisma)
-            )
-            if (created) log(`✨ Database created`)
+            // MongoDB doesn't need createDatabase — the database is created automatically
+            if (system.config.db.provider !== 'mongodb') {
+              const created = await createDatabase(
+                system.config.db.url,
+                path.dirname(paths.schema.prisma)
+              )
+              if (created) log(`✨ Database created`)
+            }
 
             const migration = await withMigrate(paths.schema.prisma, system, async m => {
               // what does force on migrate.engine.schemaPush mean?
