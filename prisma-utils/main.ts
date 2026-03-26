@@ -157,9 +157,7 @@ async function generate(provider: Provider) {
   // we generate fallback filter types using PostgreSQL's DMMF so that the
   // TypeScript type system stays consistent across all providers.
   const scalarsForProvider = provider === 'mongodb' ? MONGODB_SCALARS : SCALARS
-  const missingScalars = SCALARS.filter(
-    s => !(scalarsForProvider as readonly string[]).includes(s)
-  )
+  const missingScalars = SCALARS.filter(s => !(scalarsForProvider as readonly string[]).includes(s))
   let fallbackFilterTypes: DMMF.InputType[] = []
   if (missingScalars.length > 0) {
     const fallbackSchema = getSchemaForProvider('postgresql')

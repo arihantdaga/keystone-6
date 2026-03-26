@@ -91,10 +91,12 @@ export function config<TypeInfo extends BaseKeystoneTypeInfo>(
   }
 
   // WARNING: Typescript should prevent this, but any string is useful for Prisma errors
-  config.db.url ??= config.db.provider === 'mongodb' ? 'mongodb://localhost:27017/keystone' : 'postgres://'
+  config.db.url ??=
+    config.db.provider === 'mongodb' ? 'mongodb://localhost:27017/keystone' : 'postgres://'
 
   const defaultIdField =
-    config.db.idField ?? (config.db.provider === 'mongodb' ? { kind: 'objectid' as const } : { kind: 'cuid' as const })
+    config.db.idField ??
+    (config.db.provider === 'mongodb' ? { kind: 'objectid' as const } : { kind: 'cuid' as const })
   const cors =
     config.server?.cors === true
       ? { origin: true, credentials: true }

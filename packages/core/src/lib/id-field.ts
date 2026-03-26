@@ -190,9 +190,7 @@ export function idFieldType(config: IdFieldConfig): FieldTypeFunc<BaseListTypeIn
     }
 
     if (meta.provider !== 'mongodb' && kind === 'objectid') {
-      throw new Error(
-        `{ kind: 'objectid' } is only supported with the MongoDB provider`
-      )
+      throw new Error(`{ kind: 'objectid' } is only supported with the MongoDB provider`)
     }
 
     return fieldType({
